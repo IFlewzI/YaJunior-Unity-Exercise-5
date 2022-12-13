@@ -23,7 +23,8 @@ public class AlarmSpeaker : MonoBehaviour
         if (_signalisationInJob != null)
             StopCoroutine(_signalisationInJob);
 
-        _signalisationInJob = StartCoroutine(TurnSignalisationOn());
+        _signalisationInJob = StartCoroutine(SwitchSignalisationState(_signalisationMaxVolume));
+        _isSignalisationInJob = true;
     }
 
     public void EndSignalisation()
@@ -31,33 +32,26 @@ public class AlarmSpeaker : MonoBehaviour
         if (_signalisationInJob != null)
             StopCoroutine(_signalisationInJob);
 
-        _signalisationInJob = StartCoroutine(TurnSignalisationOff());
+        _signalisationInJob = StartCoroutine(SwitchSignalisationState(_signalisationMinVolume));
+        _isSignalisationInJob = false;
     }
 
-    private IEnumerator TurnSignalisationOn()
+    private IEnumerator SwitchSignalisationState(float targetVolume)
     {
-        _audioSource.volume = _signalisationMinVolume;
-        _audioSource.Play();
-
-        while (_audioSource.volume < _signalisationMaxVolume)
+        if (!_isSignalisationInJob)
         {
-            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _signalisationMaxVolume, _signalisationVolumeStep * Time.deltaTime);
-
-            yield return null;
+            _audioSource.volume = 0;
+            _audioSource.Play();
         }
-    }
 
-    private IEnumerator TurnSignalisationOff()
-    {
-        _audioSource.volume = _signalisationMaxVolume;
-        
-        while (_audioSource.volume > _signalisationMinVolume)
+        while (_audioSource.volume != targetVolume)
         {
-            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _signalisationMinVolume, _signalisationVolumeStep * Time.deltaTime);
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, targetVolume, _signalisationVolumeStep * Time.deltaTime);
 
             yield return null;
         }
 
-        _audioSource.Stop();
+        if (_isSignalisationInJob)
+            _audioSource.Stop();
     }
 }
