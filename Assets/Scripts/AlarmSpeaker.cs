@@ -20,25 +20,27 @@ public class AlarmSpeaker : MonoBehaviour
 
     public void StartSignalisaton()
     {
-        if (_signalisationInJob != null)
-            StopCoroutine(_signalisationInJob);
-
-        _signalisationInJob = StartCoroutine(SwitchSignalisationState(_signalisationMaxVolume));
         _isSignalisationInJob = true;
+        RunSwitchSignalisationStateCoroutine(ref _signalisationInJob, _signalisationMaxVolume);
     }
 
     public void EndSignalisation()
     {
-        if (_signalisationInJob != null)
-            StopCoroutine(_signalisationInJob);
-
-        _signalisationInJob = StartCoroutine(SwitchSignalisationState(_signalisationMinVolume));
         _isSignalisationInJob = false;
+        RunSwitchSignalisationStateCoroutine(ref _signalisationInJob, _signalisationMinVolume);
+    }
+
+    private void RunSwitchSignalisationStateCoroutine(ref Coroutine coroutineInJob, float targetVolume)
+    {
+        if (coroutineInJob != null)
+            StopCoroutine(coroutineInJob);
+
+        coroutineInJob = StartCoroutine(SwitchSignalisationState(targetVolume));
     }
 
     private IEnumerator SwitchSignalisationState(float targetVolume)
     {
-        if (!_isSignalisationInJob)
+        if (_isSignalisationInJob)
         {
             _audioSource.volume = 0;
             _audioSource.Play();
@@ -51,7 +53,7 @@ public class AlarmSpeaker : MonoBehaviour
             yield return null;
         }
 
-        if (_isSignalisationInJob)
+        if (!_isSignalisationInJob)
             _audioSource.Stop();
     }
 }

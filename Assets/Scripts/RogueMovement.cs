@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class Rogue : MonoBehaviour
+public class RogueMovement : MonoBehaviour
 {
     private SpriteRenderer _spriteRenderer;
     private Vector3 _lastPosition;
